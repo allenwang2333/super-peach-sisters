@@ -15,7 +15,8 @@ class Actor :public GraphObject {
         m_alive(true), m_depth(depth) {}
 
         virtual ~Actor() {}
-        virtual void isBonked();
+        virtual void isBonked() {}
+        virtual void isDamaged() {}
         StudentWorld* getStudentWorld() { return m_studentWorld; }
         bool isAlive() { return m_alive; }
         void setDead() { m_alive = false; }
@@ -40,15 +41,14 @@ class Peach :public Actor {
 
         virtual ~Peach() {}
         virtual void isBonked();
+        virtual void isDamaged();
         virtual void gainPower(int type);
         virtual void setHitPoint(int point);
         virtual bool getStarPower() {return m_starPower>0;}
         virtual bool getShootPower() {return m_shootPower;}
         virtual bool getJumpPower() {return m_jumPower;}
-        bool isInvincible() { return m_currentInvincibility <= 0; }
-        //TODO: finish do something: direction
-
-        
+        bool isInvincible() { return m_starPower > 0; }
+        // TODO: still confused by it
         virtual void doSomething();
     private:
         int m_health;
@@ -102,19 +102,18 @@ class PiranhaFireball :public Fireball {
 
         virtual ~PiranhaFireball() {}
         virtual void isBonked() {}
-        virtual void doSomething() {}
+        virtual void doSomething();
     private:
 };
 
-class Flag :public Actor {
-    public:
-        Flag(StudentWorld* studentWorld, int startX, int startY)
-        : Actor(studentWorld, IID_FLAG, startX, startY, 0, 1, 1)
-        {}
-
-        virtual ~Flag() {}
-        virtual void isBonked() {}
-        virtual void doSomething() {}
+class Shell :public Fireball {
+    public: 
+        Shell(StudentWorld* studentWorld, int startX, int startY, int dir)
+        : Fireball(studentWorld, IID_SHELL, startX, startY, dir)
+        { std::cerr << "a shell is created"<< std::endl;}
+        virtual ~Shell() {}
+        virtual void doSomething();
+    private:
 };
 
 class BlockingObjects: public Actor {
@@ -217,14 +216,81 @@ class StarGoodie :public Goodie {
 
 class Enemies :public Actor {
     public:
-        Enemies(StudentWorld* studentWorld, int imageID,int startX, int startY)
-        : Actor(studentWorld, imageID, startX, startY, 0, 0, 1.0)
+        Enemies(StudentWorld* studentWorld, int imageID ,int startX, int startY, int dir)
+        : Actor(studentWorld, imageID, startX, startY, dir, 0, 1.0)
         {}
+
+        virtual ~Enemies() {}
 
         virtual void doSomething(){}
         virtual void isBonked() {}
         virtual void isDamaged() {}
     private:
+};
+
+class Goomba :public Enemies {
+    public:
+        Goomba(StudentWorld* studentWorld, int startX, int startY, int dir)
+        : Enemies(studentWorld, IID_GOOMBA, startX, startY, dir)
+        {}
+
+        virtual ~Goomba() {}
+        virtual void doSomething();
+        virtual void isBonked();
+        virtual void isDamaged();
+    private:
+};
+
+class Koopa :public Enemies {
+    public:
+        Koopa(StudentWorld* studentWorld, int startX, int startY, int dir)
+        : Enemies(studentWorld, IID_KOOPA, startX, startY, dir)
+        {}
+
+        virtual ~Koopa() {}
+        virtual void doSomething();
+        virtual void isBonked();
+        virtual void isDamaged();
+    private:
+};
+
+class Piranha :public Enemies {
+    public:
+        Piranha(StudentWorld* studentWorld, int startX, int startY, int dir)
+         :Enemies(studentWorld, IID_PIRANHA, startX, startY, dir), m_firingDelay(0)
+        {}
+        virtual ~Piranha() {}
+        virtual void doSomething();
+        virtual void isBonked();
+        virtual void isDamaged();
+    private:
+        int m_firingDelay;
+};
+
+class Flag :public Actor {
+    public:
+
+        Flag(StudentWorld* studentWorld, int startX, int startY)
+         :Actor(studentWorld, IID_FLAG, startX, startY, 0, 1, 1)
+        {}
+
+        virtual ~Flag() {}
+        virtual void doSomething();
+        virtual void isBonked() {}
+        virtual void isDamaged() {}
+    private:
+
+};
+
+class Mario :public Actor {
+    public:
+        Mario(StudentWorld* studentWorld, int startX, int startY)
+        :Actor(studentWorld, IID_MARIO, startX, startY, 0, 1, 1)
+        {}
+
+        virtual ~Mario() {}
+        virtual void doSomething();
+
 };
 
 #endif // ACTOR_H_

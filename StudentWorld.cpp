@@ -15,7 +15,7 @@ GameWorld* createStudentWorld(string assetPath)
 // Students:  Add code to this file, StudentWorld.h, Actor.h, and Actor.cpp
 
 StudentWorld::StudentWorld(string assetPath)
-: GameWorld(assetPath)
+: GameWorld(assetPath), m_nexLevel(false), m_reachedMario(false)
 {
 }
 
@@ -25,6 +25,9 @@ StudentWorld::~StudentWorld() {
 
 int StudentWorld::init()
 {
+    m_nexLevel = false;
+    m_reachedMario = false;
+    
     // initialize ostream file name
     ostringstream oss;
     oss.fill('0');
@@ -39,9 +42,11 @@ int StudentWorld::init()
     Level::LoadResult result = lev.loadLevel(level_file);
     if (result == Level::load_fail_file_not_found) {
         cerr << "Could not find" << s <<" data file" << endl;
+        return GWSTATUS_LEVEL_ERROR;
     }
     else if (result == Level::load_fail_bad_format) {
         cerr << "level01.txt is improperly formatted" << endl; 
+        return GWSTATUS_LEVEL_ERROR;
     }
     else if (result == Level::load_success) {
         cerr << "Successfully loaded level" << endl;
@@ -76,12 +81,20 @@ int StudentWorld::init()
                 case Level::flag:
                     m_actors.push_back(new Flag(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT));
                     break;
+                case Level::goomba:
+                    m_actors.push_back(new Goomba(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, getRandomInt()));
+                    break;
+                case Level::koopa:
+                    m_actors.push_back(new Koopa(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, getRandomInt()));
+                    break;
+                case Level::piranha:
+                    m_actors.push_back(new Piranha(this, i * SPRITE_HEIGHT, j * SPRITE_WIDTH, getRandomInt()));
                 default:
                     break;
                 }        
             }
         }
-    
+
     }
 
     return GWSTATUS_CONTINUE_GAME;
@@ -89,7 +102,7 @@ int StudentWorld::init()
 
 bool StudentWorld::isBlockingObjectAt(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
-        if((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) && (*p)->getDepth() == 2) {
+        if((*p)->getDepth() == 2 && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             return true;
         }
     }
@@ -98,11 +111,29 @@ bool StudentWorld::isBlockingObjectAt(double x, double y) {
 
 bool StudentWorld::isOverlap(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
-        if((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) && (*p)->getDepth() == 0) {
+        //TODO: check if this is correct
+        if(((*p)->getDepth() == 0) && (*p)->isAlive() && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             return true;
         }
     }
     return false;
+}
+
+bool StudentWorld::isOverlapPeach(double x, double y) {
+    double peachX = m_peach->getX();
+    double peachY = m_peach->getY();
+    if (x < peachX+8 && x+8 > peachX && y < peachY+8 && y+8 > peachY) {
+        return true;
+    }
+    return false;
+}
+
+void StudentWorld::moveToNext() {
+    m_nexLevel = true;
+}
+
+void StudentWorld::reachedMario() {
+    m_reachedMario = true;
 }
 
 int StudentWorld::move()
@@ -117,12 +148,38 @@ int StudentWorld::move()
     oscore << setw(6) << getScore();
     string f = oscore.str();
 
-    m_peach->doSomething();
+    if (m_peach->isAlive()){
+        m_peach->doSomething();
+            
+    }
+
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
         if ((*p)->isAlive()){
             (*p)->doSomething();
         }
     }
+
+    if (!m_peach->isAlive()){
+        playSound(SOUND_PLAYER_DIE);
+        cerr <<"pach is killed" << endl;
+        return GWSTATUS_PLAYER_DIED;
+        
+        //TODO: reach mario
+        //TODO: won game
+    }
+
+    if (m_nexLevel) {
+        playSound(SOUND_FINISHED_LEVEL);
+        return GWSTATUS_FINISHED_LEVEL;
+    }
+
+    if (m_reachedMario) {
+        playSound(SOUND_GAME_OVER);
+        return GWSTATUS_PLAYER_WON;
+    }
+
+
+
     deleteActor();
 
     string lives = intToString(getLives());
@@ -156,12 +213,32 @@ string StudentWorld::intToString(int input) {
     return ss.str();
 }
 
+int StudentWorld::getRandomInt() {
+    if (randInt(0, 180) >= 90) return 0;
+    else return 180;
+}
+
 void StudentWorld::bonk(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++){
         if((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
             (x + 4 >= (*p)->getX() && x + 4 < (*p)->getX() + SPRITE_WIDTH && y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
-            (*p)->isBonked();
-            return;
+            if ((*p)->isAlive()){
+                (*p)->isBonked();
+                return;
+            }
+        }
+    }
+    return;
+}
+
+void StudentWorld::damage(double x, double y) {
+    for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++){
+        if((*p)->getDepth() == 0 && ((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
+            (x + 4 >= (*p)->getX() && x + 4 < (*p)->getX() + SPRITE_WIDTH && y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT))) {
+            if ((*p)->isAlive()){
+                (*p)->isDamaged();
+                return;
+            }
         }
     }
     return;
@@ -173,6 +250,10 @@ void StudentWorld::newFireball(double x, double y, int dir, int type) {
     if (type == 0) {
         m_actors.push_back(new PeachFireball(this, x, y, dir));
     }
+    if (type == 1) {
+        m_actors.push_back(new PiranhaFireball(this, x, y, dir));
+    }
+    return;
 }
 
 void StudentWorld::newGoodie(double x, double y, int type) {
@@ -193,6 +274,10 @@ void StudentWorld::newGoodie(double x, double y, int type) {
     }
 }
 
+void StudentWorld::newShell(double x, double y, int dir) {
+    m_actors.push_back(new Shell(this, x, y, dir));
+}
+
 void StudentWorld::deleteActor() {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); ){
         vector<Actor*>::iterator temp = p;
@@ -210,7 +295,9 @@ void StudentWorld::cleanUp()
 {
     cerr << "start to cleanup" << endl;
     delete m_peach;
-    for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
-        delete (*p);
+    while (!m_actors.empty()){
+        delete m_actors[m_actors.size()-1];
+        m_actors.pop_back();
     }
+    cerr << "end to cleanup" << endl;
 }
