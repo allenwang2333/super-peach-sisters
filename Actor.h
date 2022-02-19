@@ -35,7 +35,7 @@ class Peach :public Actor {
     public:
         Peach(StudentWorld* studentWorld, int startX, int startY)
         : Actor(studentWorld, IID_PEACH, startX, startY, 0, 0, 1.0),
-         m_health(1), m_currentInvincibility(0),m_temporaryInvincibility(0), 
+         m_health(1), m_temporaryInvincibility(0), 
          m_starPower(0), m_shootPower(false), m_jumPower(false), 
          m_timeToRecharge(0), m_rJumpDistance(0), m_hitPoint(0)
           {}
@@ -50,12 +50,9 @@ class Peach :public Actor {
         virtual bool getJumpPower() {return m_jumPower;}
         bool isInvincible() { return m_starPower > 0; }
         virtual bool isDamageable() {return true;}
-
-        // TODO: still confused by it
         virtual void doSomething();
     private:
         int m_health;
-        int m_currentInvincibility;
         int m_temporaryInvincibility;
         int m_timeToRecharge;
         int m_starPower;

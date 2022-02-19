@@ -111,7 +111,6 @@ bool StudentWorld::isBlockingObjectAt(double x, double y) {
 
 bool StudentWorld::isOverlap(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
-        //TODO: check if this is correct
         if((*p)->isDamageable() && (*p)->isAlive() && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             return true;
         }
@@ -293,11 +292,9 @@ void StudentWorld::deleteActor() {
 
 void StudentWorld::cleanUp()
 {
-    cerr << "start to cleanup" << endl;
     delete m_peach;
     while (!m_actors.empty()){
         delete m_actors[m_actors.size()-1];
         m_actors.pop_back();
     }
-    cerr << "end to cleanup" << endl;
 }

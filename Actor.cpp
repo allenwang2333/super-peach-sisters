@@ -8,7 +8,6 @@ void BlockingObjects::isBonked() {
 }
 
 void Block::doSomething() {
-    
 }
 
 void Block::isBonked() {
@@ -94,8 +93,8 @@ void Peach::doSomething() {
         return;
     }
 
-    if (m_currentInvincibility > 0) {
-        m_currentInvincibility--;
+    if (m_starPower > 0) {
+        m_starPower--;
     }
     
     if (m_temporaryInvincibility > 0) {
@@ -527,7 +526,6 @@ void Piranha::doSomething() {
             getStudentWorld()->newFireball(getX(), getY(), getDirection(), 1);
             getStudentWorld()->playSound(SOUND_PIRANHA_FIRE);
             m_firingDelay = 40;
-            cerr << "a fireball is fired" << endl;
         }
         
     }
