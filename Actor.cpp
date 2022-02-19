@@ -397,21 +397,15 @@ void Shell::doSomething() {
         setDead();
         return;
     }
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1)){
+    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2) ||
+        getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-2) ||
+        getStudentWorld()->isBlockingObjectAt(getX()+6, getY()-2) ||
+        getStudentWorld()->isBlockingObjectAt(getX()+8, getY()-2)
+        ){
         
     }
     else {
-        //moveTo(getX(), getY()-2);
-    }
-    if (getDirection() == 0){
-        if (getStudentWorld()->isBlockingObjectAt(getX()+2, getY()-2)||
-        getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-4)||
-        getStudentWorld()->isBlockingObjectAt(getX()+6, getY()-6)){
-        // TODO: different from spec there's a bug in the demo
-        }
-        else {
-            moveTo(getX(), getY()-2);
-        }
+        moveTo(getX(), getY()-2);
     }
     
     double x = getX();

@@ -82,13 +82,13 @@ int StudentWorld::init()
                     m_actors.push_back(new Flag(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT));
                     break;
                 case Level::goomba:
-                    m_actors.push_back(new Goomba(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, getRandomInt()));
+                    m_actors.push_back(new Goomba(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, 180 * randInt(0, 1)));
                     break;
                 case Level::koopa:
-                    m_actors.push_back(new Koopa(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, getRandomInt()));
+                    m_actors.push_back(new Koopa(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, 180 * randInt(0, 1)));
                     break;
                 case Level::piranha:
-                    m_actors.push_back(new Piranha(this, i * SPRITE_HEIGHT, j * SPRITE_WIDTH, getRandomInt()));
+                    m_actors.push_back(new Piranha(this, i * SPRITE_HEIGHT, j * SPRITE_WIDTH, 180 * randInt(0, 1)));
                 default:
                     break;
                 }        
@@ -102,7 +102,7 @@ int StudentWorld::init()
 
 bool StudentWorld::isBlockingObjectAt(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
-        if((*p)->getDepth() == 2 && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
+        if((*p)->isBlocking() && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             return true;
         }
     }
@@ -112,7 +112,7 @@ bool StudentWorld::isBlockingObjectAt(double x, double y) {
 bool StudentWorld::isOverlap(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++) {
         //TODO: check if this is correct
-        if(((*p)->getDepth() == 0) && (*p)->isAlive() && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
+        if((*p)->isDamageable() && (*p)->isAlive() && (x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             return true;
         }
     }
@@ -233,7 +233,7 @@ void StudentWorld::bonk(double x, double y) {
 
 void StudentWorld::damage(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++){
-        if((*p)->getDepth() == 0 && ((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
+        if((*p)->isDamageable() && ((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
             (x + 4 >= (*p)->getX() && x + 4 < (*p)->getX() + SPRITE_WIDTH && y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT))) {
             if ((*p)->isAlive()){
                 (*p)->isDamaged();

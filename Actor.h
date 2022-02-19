@@ -12,7 +12,8 @@ class Actor :public GraphObject {
         Actor(StudentWorld* studentWorld, int imageID, int startX, int startY, int dir, int depth, double size) 
         : m_studentWorld(studentWorld), 
         GraphObject(imageID, startX, startY, dir, depth, size), 
-        m_alive(true), m_depth(depth) {}
+        m_alive(true)
+        {}
 
         virtual ~Actor() {}
         virtual void isBonked() {}
@@ -21,12 +22,12 @@ class Actor :public GraphObject {
         bool isAlive() { return m_alive; }
         void setDead() { m_alive = false; }
         virtual void doSomething() = 0;
-        int getDepth() { return m_depth; }
+        virtual bool isBlocking() {return false;}
+        virtual bool isDamageable() {return false;}
 
     private:
         StudentWorld* m_studentWorld;
         bool m_alive; 
-        int m_depth;
 
 };  
 
@@ -48,6 +49,8 @@ class Peach :public Actor {
         virtual bool getShootPower() {return m_shootPower;}
         virtual bool getJumpPower() {return m_jumPower;}
         bool isInvincible() { return m_starPower > 0; }
+        virtual bool isDamageable() {return true;}
+
         // TODO: still confused by it
         virtual void doSomething();
     private:
@@ -125,13 +128,16 @@ class BlockingObjects: public Actor {
         virtual ~BlockingObjects() {}
         virtual void isBonked();
         virtual void doSomething() {}
+         virtual bool isBlocking() {return true;}
+         virtual bool isDamageable() {return false;}
+
     private:
 };
 
 class Block :public BlockingObjects {    
     public:
         Block(StudentWorld* studentWorld, int startX, int startY, int goodie) 
-        : BlockingObjects(studentWorld, IID_BLOCK, startX, startY, 0, 2, 1), m_bonked(false),
+        : BlockingObjects(studentWorld, IID_BLOCK, startX, startY, 0, 2, 1),
         m_goodie(goodie) {}
 
         virtual ~Block() {}
@@ -145,7 +151,6 @@ class Block :public BlockingObjects {
             mushroomGoodie = 3
         */
         int m_goodie;
-        bool m_bonked;
 };
 
 class Pipe :public BlockingObjects {
@@ -221,7 +226,7 @@ class Enemies :public Actor {
         {}
 
         virtual ~Enemies() {}
-
+        virtual bool isDamageable() {return true;}
         virtual void doSomething(){}
         virtual void isBonked() {}
         virtual void isDamaged() {}
@@ -278,6 +283,7 @@ class Flag :public Actor {
         virtual void doSomething();
         virtual void isBonked() {}
         virtual void isDamaged() {}
+
     private:
 
 };
