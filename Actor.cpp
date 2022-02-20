@@ -5,6 +5,7 @@
 using namespace std;
 
 void BlockingObjects::isBonked() {
+    getStudentWorld()->playSound(SOUND_PLAYER_BONK);
 }
 
 void Block::doSomething() {
@@ -240,8 +241,8 @@ void Peach::doSomething() {
 void FlowerGoodie::doSomething() {
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->increaseScore(50);
-        getStudentWorld()->getPeach()->gainPower(2);
-        getStudentWorld()->getPeach()->setHitPoint(2);
+        getStudentWorld()->gainPeachPower(2);
+        getStudentWorld()->gainPeachPower(4, 2);
         setDead();
         getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
         return;
@@ -272,8 +273,8 @@ void FlowerGoodie::doSomething() {
 void MushroomGoodie::doSomething() {
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->increaseScore(75);
-        getStudentWorld()->getPeach()->gainPower(3);
-        getStudentWorld()->getPeach()->setHitPoint(2);
+        getStudentWorld()->gainPeachPower(3);
+        getStudentWorld()->gainPeachPower(4, 2);
         setDead();
         getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
         return;
@@ -304,7 +305,7 @@ void MushroomGoodie::doSomething() {
 void StarGoodie::doSomething() {
     if ((getStudentWorld()->isOverlapPeach(getX(), getY()))) {
         getStudentWorld()->increaseScore(150);
-        getStudentWorld()->getPeach()->gainPower(1);
+        getStudentWorld()->gainPeachPower(1);
         setDead();
         getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
         return;
@@ -364,7 +365,7 @@ void PeachFireball::doSomething() {
 
 void PiranhaFireball::doSomething() {
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
-        getStudentWorld()->getPeach()->isDamaged();
+        getStudentWorld()->damagePeach();
         setDead();
     }
     if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2))
@@ -424,7 +425,7 @@ void Goomba::doSomething() {
         return;
     }
     if (getStudentWorld()->isOverlapPeach(getX(), getY())){
-        getStudentWorld()->getPeach()->isBonked();
+        getStudentWorld()->bonkPeach();
         isBonked();
         return;
     }
@@ -445,7 +446,7 @@ void Goomba::doSomething() {
 }
 
 void Goomba::isBonked() {
-    if (getStudentWorld()->getPeach()->isInvincible()){
+    if (getStudentWorld()->getPeachPower(1)){
         getStudentWorld()->playSound(SOUND_PLAYER_KICK);
         getStudentWorld()->increaseScore(100);
         setDead();
@@ -462,7 +463,7 @@ void Koopa::doSomething() {
         return;
     }
     if (getStudentWorld()->isOverlapPeach(getX(), getY())){
-        getStudentWorld()->getPeach()->isBonked();
+        getStudentWorld()->bonkPeach();
         isBonked();
         return;
     }
@@ -483,7 +484,7 @@ void Koopa::doSomething() {
 }
 
 void Koopa::isBonked() {
-    if (getStudentWorld()->getPeach()->isInvincible()){
+    if (getStudentWorld()->getPeachPower(1)){
         getStudentWorld()->playSound(SOUND_PLAYER_KICK);
         getStudentWorld()->increaseScore(100);
         setDead();
@@ -504,14 +505,14 @@ void Piranha::doSomething() {
     }
     increaseAnimationNumber();
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
-        getStudentWorld()->getPeach()->isBonked();
+        getStudentWorld()->bonkPeach();
         isBonked();
         return;
     }
-    if (!(abs(getStudentWorld()->getPeach()->getY()-getY()) <= 1.5 * SPRITE_HEIGHT)) {
+    if (!(abs(getStudentWorld()->getPeachY()-getY()) <= 1.5 * SPRITE_HEIGHT)) {
         return;
     }
-    if (getStudentWorld()->getPeach()->getX()-getX() < getX()) {
+    if (getStudentWorld()->getPeachX()-getX() < getX()) {
         setDirection(180);
     }
     else {
@@ -520,7 +521,7 @@ void Piranha::doSomething() {
     if (m_firingDelay > 0){
         m_firingDelay--;
     }
-    double distance = abs(getStudentWorld()->getPeach()->getX() - this->getX());
+    double distance = abs(getStudentWorld()->getPeachX() - this->getX());
     if (distance < 8 * SPRITE_WIDTH) {
         if (m_firingDelay <= 0) {
             getStudentWorld()->newFireball(getX(), getY(), getDirection(), 1);
@@ -533,7 +534,7 @@ void Piranha::doSomething() {
 }
 
 void Piranha::isBonked() {
-     if (getStudentWorld()->getPeach()->isInvincible()){
+     if (getStudentWorld()->getPeachPower(1)){
         getStudentWorld()->playSound(SOUND_PLAYER_KICK);
         getStudentWorld()->increaseScore(100);
         setDead();

@@ -30,14 +30,26 @@ public:
   bool isOverlapPeach(double x, double y);
   void moveToNext();
   void reachedMario();
+  bool getPeachPower(int type);
+  void gainPeachPower(int type, int num = 0);
+  void bonkPeach();
+  void damagePeach();
+  double getPeachX();
+  double getPeachY();
 
 private:
   std::vector<Actor*> m_actors;
   Peach* m_peach;
   std::string intToString(int input);
-  int getRandomInt();
   bool m_nexLevel;
   bool m_reachedMario;
+
+     /*
+            starGoodie = 1 --> starPower
+            flowerGoodie = 2 --> shootPower
+            mushroomGoodie = 3 --> jumpPower
+            hit point = 4 --> hit point
+        */
 };
 
 #endif // STUDENTWORLD_H_

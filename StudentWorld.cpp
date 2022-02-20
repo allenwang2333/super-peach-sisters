@@ -212,11 +212,6 @@ string StudentWorld::intToString(int input) {
     return ss.str();
 }
 
-int StudentWorld::getRandomInt() {
-    if (randInt(0, 180) >= 90) return 0;
-    else return 180;
-}
-
 void StudentWorld::bonk(double x, double y) {
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++){
         if((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
@@ -298,3 +293,46 @@ void StudentWorld::cleanUp()
         m_actors.pop_back();
     }
 }
+
+bool StudentWorld::getPeachPower(int type) {
+    switch (type)
+    {
+    case 1:
+        return (m_peach->getStarPower());
+        break;
+    case 2:
+        return (m_peach->getShootPower());
+        break;
+    case 3:
+        return (m_peach->getJumpPower());
+        break;    
+    default:
+        return false;
+        break;
+    }
+}
+
+void StudentWorld::gainPeachPower(int type, int num) {
+    switch (type)
+    {
+    case 1:
+        return (m_peach->gainPower(1));
+        break;
+    case 2:
+        return (m_peach->gainPower(2));
+        break;
+    case 3:
+        return (m_peach->gainPower(3));
+        break;
+    case 4:
+        m_peach->setHitPoint(num);
+        break;    
+    default:
+        break;
+    }
+}
+
+void StudentWorld::bonkPeach() {m_peach->isBonked();}
+void StudentWorld::damagePeach() {m_peach->isDamaged();}
+double StudentWorld::getPeachX() {return m_peach->getX();}
+double StudentWorld::getPeachY() {return m_peach->getY();}

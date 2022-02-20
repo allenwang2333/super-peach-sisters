@@ -48,7 +48,6 @@ class Peach :public Actor {
         virtual bool getStarPower() {return m_starPower>0;}
         virtual bool getShootPower() {return m_shootPower;}
         virtual bool getJumpPower() {return m_jumPower;}
-        bool isInvincible() { return m_starPower > 0; }
         virtual bool isDamageable() {return true;}
         virtual void doSomething();
     private:
@@ -125,8 +124,8 @@ class BlockingObjects: public Actor {
         virtual ~BlockingObjects() {}
         virtual void isBonked();
         virtual void doSomething() {}
-         virtual bool isBlocking() {return true;}
-         virtual bool isDamageable() {return false;}
+        virtual bool isBlocking() {return true;}
+        virtual bool isDamageable() {return false;}
 
     private:
 };
