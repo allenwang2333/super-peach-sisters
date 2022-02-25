@@ -19,7 +19,7 @@ public:
   virtual int move();
   virtual void cleanUp();
   virtual void bonk(double x, double y);
-  virtual void damage(double x, double y);
+  virtual bool damage(double x, double y);
   virtual bool isBlockingObjectAt(double x, double y);
   virtual Peach* getPeach() { return m_peach; }
   virtual void newFireball(double x, double y, int dir, int type);

@@ -5,32 +5,41 @@
 using namespace std;
 
 void BlockingObjects::isBonked() {
+    /*
+        virtual function of isBonked
+        play bonk sound when bonked
+    */
+
     getStudentWorld()->playSound(SOUND_PLAYER_BONK);
 }
 
-void Block::doSomething() {
-}
-
 void Block::isBonked() {
+    /* 
+        if not holding goodie,
+        play bonk sound when bonked
+        if holding goodie,  release that goodie and play a sound
+    */
+    
     if (m_goodie <= 0) {
-        getStudentWorld()->playSound(SOUND_PLAYER_BONK);   
+        // no goodie
+        getStudentWorld()->playSound(SOUND_PLAYER_BONK);
     }
     else {
         getStudentWorld()->playSound(SOUND_POWERUP_APPEARS);
         switch (m_goodie) {
-        case 1:
+        case 1: // in actor.h, 1 indicates startGoodie
             getStudentWorld()->newGoodie(getX(), getY()+8, 1);
             break;
-        case 2:
+        case 2: // 2 indicates flowerGoodie
             getStudentWorld()->newGoodie(getX(), getY()+8, 2);
             break;
-        case 3:
+        case 3: // 3 indicates mushroomGoodie
             getStudentWorld()->newGoodie(getX(), getY()+8, 3);
             break;
         default:
             break;
         }
-        m_goodie = 0;
+        m_goodie = 0; // clear the goodie that the block is holding
     }
 }
 
@@ -238,15 +247,7 @@ void Peach::doSomething() {
     }
 }
 
-void FlowerGoodie::doSomething() {
-    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
-        getStudentWorld()->increaseScore(50);
-        getStudentWorld()->gainPeachPower(2);
-        getStudentWorld()->gainPeachPower(4, 2);
-        setDead();
-        getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
-        return;
-    }
+void Goodie::helper() {
     if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
     getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-1)) {
     }
@@ -254,7 +255,6 @@ void FlowerGoodie::doSomething() {
         moveTo(getX(), getY()-2);
         //return;
     }
-    
     double x = getX();
     double y = getY();
     getPositionInThisDirection(getDirection(), 2, x, y);
@@ -268,6 +268,18 @@ void FlowerGoodie::doSomething() {
         return;
     }
     moveForward(2);
+}
+
+void FlowerGoodie::doSomething() {
+    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
+        getStudentWorld()->increaseScore(50);
+        getStudentWorld()->gainPeachPower(2);
+        getStudentWorld()->gainPeachPower(4, 2);
+        setDead();
+        getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
+        return;
+    }
+    helper();  
 }
 
 void MushroomGoodie::doSomething() {
@@ -279,27 +291,7 @@ void MushroomGoodie::doSomething() {
         getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
         return;
     }
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
-    getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-1)) {
-    }
-    else {
-        moveTo(getX(), getY()-2);
-        //return;
-    }
-    
-    double x = getX();
-    double y = getY();
-    getPositionInThisDirection(getDirection(), 2, x, y);
-
-    if (getStudentWorld()->isBlockingObjectAt(x, y) || 
-    getStudentWorld()->isBlockingObjectAt(x+6,y) || 
-    getStudentWorld()->isBlockingObjectAt(x,y+7) ||
-    getStudentWorld()->isBlockingObjectAt(x+6,y+7))
-    {
-        setDirection(180 - getDirection());
-        return;
-    }
-    moveForward(2);
+    helper();
 }
 
 void StarGoodie::doSomething() {
@@ -310,36 +302,10 @@ void StarGoodie::doSomething() {
         getStudentWorld()->playSound(SOUND_PLAYER_POWERUP);
         return;
     }
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
-    getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-1)) {
-    }
-    else {
-        moveTo(getX(), getY()-2);
-    }
-    
-    double x = getX();
-    double y = getY();
-    getPositionInThisDirection(getDirection(), 2, x, y);
-
-    if (getStudentWorld()->isBlockingObjectAt(x, y) || 
-    getStudentWorld()->isBlockingObjectAt(x+6,y) || 
-    getStudentWorld()->isBlockingObjectAt(x,y+7) ||
-    getStudentWorld()->isBlockingObjectAt(x+6,y+7))
-    {
-        setDirection(180 - getDirection());
-        return;
-    }
-    moveForward(2);
+    helper();
 }
 
-void PeachFireball::doSomething() {
-    if (getStudentWorld()->isOverlap(getX(), getY()) || 
-    getStudentWorld()->isOverlap(getX()+4, getY()))
-    {
-        getStudentWorld()->damage(getX(), getY());
-        setDead();
-        return;
-    }
+void Fireball::helper() {
     if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
     getStudentWorld()->isBlockingObjectAt(getX()+7, getY()-1))
     
@@ -361,70 +327,51 @@ void PeachFireball::doSomething() {
         return;
     }
     moveForward(2);
+    increaseAnimationNumber();
+}
+
+
+void PeachFireball::doSomething() {
+    if (getStudentWorld()->isOverlap(getX(), getY()) || 
+    getStudentWorld()->isOverlap(getX()+7,getY())
+    )
+    {
+        if(getStudentWorld()->damage(getX(), getY()) || getStudentWorld()->damage(getX()+7, getY())) {
+            setDead();
+            return;
+        }
+    }
+    helper();
 }
 
 void PiranhaFireball::doSomething() {
-    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
+    if (getStudentWorld()->isOverlapPeach(getX(), getY()) ||
+        getStudentWorld()->isOverlapPeach(getX()+8, getY())
+       ) {
         getStudentWorld()->damagePeach();
         setDead();
     }
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2))
-     {
-    }
-    else {
-        moveTo(getX(), getY()-2);
-    } 
-    double x = getX();
-    double y = getY();
-    getPositionInThisDirection(getDirection(), 2, x, y);
-
-    if (getStudentWorld()->isBlockingObjectAt(x, y) ||  
-    getStudentWorld()->isBlockingObjectAt(x,y+7))
-
-    {
-        setDead();
-
-        return;
-    }
-    moveForward(2);
-    increaseAnimationNumber();
+    helper();
 }
 
 void Shell::doSomething() {
     if (getStudentWorld()->isOverlap(getX(), getY()) ||
-    getStudentWorld()->isOverlap(getX()+4,getY())) {
-        getStudentWorld()->damage(getX(), getY());
-        setDead();
-        return;
+    getStudentWorld()->isOverlap(getX()+7,getY())) {
+        if(getStudentWorld()->damage(getX(), getY()) || getStudentWorld()->damage(getX()+7, getY())) {
+            setDead();
+            return;
+        }
     }
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2) ||
-        getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-2) ||
-        getStudentWorld()->isBlockingObjectAt(getX()+6, getY()-2) ||
-        getStudentWorld()->isBlockingObjectAt(getX()+8, getY()-2)
-        ){
-        
-    }
-    else {
-        moveTo(getX(), getY()-2);
-    }
-    
-    double x = getX();
-    double y = getY();
-    getPositionInThisDirection(getDirection(), 2, x, y);
-
-    if (getStudentWorld()->isBlockingObjectAt(x, y) || getStudentWorld()->isBlockingObjectAt(x+6, y))
-    {
-        setDead();
-        return;
-    }
-    moveForward(2);
+    helper();
 }
 
-void Goomba::doSomething() {
+void Enemies::doSomething() {
     if (!isAlive()){
         return;
     }
-    if (getStudentWorld()->isOverlapPeach(getX(), getY())){
+    if (getStudentWorld()->isOverlapPeach(getX(), getY()) ||
+    getStudentWorld()->isOverlapPeach(getX()+7, getY())
+    ){
         getStudentWorld()->bonkPeach();
         isBonked();
         return;
@@ -445,7 +392,7 @@ void Goomba::doSomething() {
     increaseAnimationNumber();
 }
 
-void Goomba::isBonked() {
+void Enemies::isBonked() {
     if (getStudentWorld()->getPeachPower(1)){
         getStudentWorld()->playSound(SOUND_PLAYER_KICK);
         getStudentWorld()->increaseScore(100);
@@ -453,35 +400,10 @@ void Goomba::isBonked() {
     }
 }
 
-void Goomba::isDamaged() {
+void Enemies::isDamaged() {
     getStudentWorld()->increaseScore(100);
     setDead();
-}
-
-void Koopa::doSomething() {
-    if (!isAlive()){
-        return;
-    }
-    if (getStudentWorld()->isOverlapPeach(getX(), getY())){
-        getStudentWorld()->bonkPeach();
-        isBonked();
-        return;
-    }
-    double x = getX();
-    double y = getY();
-
-    getPositionInThisDirection(getDirection(), 1, x, y);
-    if (getStudentWorld()->isBlockingObjectAt(x, y) || 
-    getStudentWorld()->isBlockingObjectAt(x+7, y) || 
-    !getStudentWorld()->isBlockingObjectAt(x, y-1) ||
-    !getStudentWorld()->isBlockingObjectAt(x+7, y-1))
-    {
-        setDirection(180 - getDirection());
-        return;
-    }
-    moveForward(1);
-    increaseAnimationNumber();
-}
+} 
 
 void Koopa::isBonked() {
     if (getStudentWorld()->getPeachPower(1)){
@@ -491,7 +413,6 @@ void Koopa::isBonked() {
         getStudentWorld()->newShell(getX(), getY(), getDirection());
     }
 }
-
 
 void Koopa::isDamaged() {
     getStudentWorld()->increaseScore(100);
@@ -527,23 +448,8 @@ void Piranha::doSomething() {
             getStudentWorld()->newFireball(getX(), getY(), getDirection(), 1);
             getStudentWorld()->playSound(SOUND_PIRANHA_FIRE);
             m_firingDelay = 40;
-        }
-        
+        }   
     }
-    
-}
-
-void Piranha::isBonked() {
-     if (getStudentWorld()->getPeachPower(1)){
-        getStudentWorld()->playSound(SOUND_PLAYER_KICK);
-        getStudentWorld()->increaseScore(100);
-        setDead();
-    }
-}
-
-void Piranha::isDamaged() {
-    getStudentWorld()->increaseScore(100);
-    setDead();
 }
 
 void Flag::doSomething() {
@@ -558,7 +464,7 @@ void Flag::doSomething() {
 }
 
 void Mario::doSomething() {
-        if (!isAlive()){
+    if (!isAlive()){
         return;
     }
     if (getStudentWorld()->isOverlapPeach(getX(), getY())){
