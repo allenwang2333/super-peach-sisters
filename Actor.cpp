@@ -44,35 +44,25 @@ void Block::isBonked() {
 }
 
 void Peach::isBonked() {
-    if (m_starPower > 0 && m_temporaryInvincibility > 0) {
+    if (m_starPower > 0 || m_temporaryInvincibility > 0) {
         
     }
-    m_hitPoint--;
-    m_temporaryInvincibility = 10;
-    m_shootPower = false;
-    m_jumPower = false;
-    if (m_hitPoint >= 1) {
-        getStudentWorld()->playSound(SOUND_PLAYER_HURT);
-    }
-    if (m_hitPoint <= 0) {
-        setDead();
+    else {
+        m_hitPoint--;
+        m_temporaryInvincibility = 10;
+        m_shootPower = false;
+        m_jumPower = false;
+        if (m_hitPoint >= 1) {
+            getStudentWorld()->playSound(SOUND_PLAYER_HURT);
+        }
+        if (m_hitPoint <= 0) {
+            setDead();
+        }
     }
 }
 
 void Peach::isDamaged() {
-    if (m_starPower > 0 && m_temporaryInvincibility > 0) {
-        
-    }
-    m_hitPoint--;
-    m_temporaryInvincibility = 10;
-    m_shootPower = false;
-    m_jumPower = false;
-    if (m_hitPoint >= 1) {
-        getStudentWorld()->playSound(SOUND_PLAYER_HURT);
-    }
-    if (m_hitPoint <= 0) {
-        setDead();
-    }
+    isBonked();
 }
 
 void Peach::setHitPoint(int point) {
@@ -115,8 +105,16 @@ void Peach::doSomething() {
         m_timeToRecharge--;
     }
     
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY())) {
-        isBonked();
+    if (getStudentWorld()->isOverlap(getX(), getY()) ||
+    getStudentWorld()->isOverlap(getX()+7, getY()) ||
+    getStudentWorld()->isOverlap(getX(), getY()+7) ||
+    getStudentWorld()->isOverlap(getX()+7, getY()+7)
+    ) {
+        if (getStudentWorld()->bonk(getX(), getY()) ||
+        getStudentWorld()->bonk(getX()+7, getY())
+        ) {
+            isBonked();
+        }
     }
 
     if (m_rJumpDistance > 0) {
@@ -128,67 +126,23 @@ void Peach::doSomething() {
             m_rJumpDistance = 0;
             return;
         }
-        this->moveTo(x, y);
-        m_rJumpDistance--;
-        if (getStudentWorld()->getKey(ch)) {
-        double x, y;
-        switch (ch)
-        {
-        case KEY_PRESS_LEFT:
-            setDirection(180);
-            x = (getX()-4);
-            y = getY();
-            if (getStudentWorld()->isBlockingObjectAt(x, y)){
-                getStudentWorld()->bonk(x,y);
-            }
-            else {
-                moveTo(getX()-4, y);
-            }
-            break;
-        case KEY_PRESS_RIGHT:
-            setDirection(0);
-            x = (getX()+8);
-            y = getY();
-            if (getStudentWorld()->isBlockingObjectAt(x, y)){
-                getStudentWorld()->bonk(x, y);
-            }
-            else {
-                moveTo(getX()+4, y);
-            }
-            break;
-        case KEY_PRESS_SPACE:
-            if (!m_shootPower) {
-                break;
-            }
-            if (m_timeToRecharge > 0) {
-                break;
-            }
-            getStudentWorld()->playSound(SOUND_PLAYER_FIRE);
-            m_timeToRecharge = 8;
-            x = getX();
-            y = getY();
-            getPositionInThisDirection(getDirection(), 4, x, y);
-            getStudentWorld()->newFireball(x, y, getDirection(), 0);
-            break;
-        default:
-            break;
+        else {
+            this->moveTo(x, y);
+            m_rJumpDistance--;
         }
     }
-        return;
-    }
-    
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()) ||
-    getStudentWorld()->isBlockingObjectAt(getX(), getY()-3) ||
-    getStudentWorld()->isBlockingObjectAt(getX()+4, getY()) ||
-    getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-3))
-    {
-        
-    }
     else {
-        moveTo(getX(), getY()-4);
+        if (getStudentWorld()->isBlockingObjectAt(getX(), getY()) ||
+        getStudentWorld()->isBlockingObjectAt(getX(), getY()-3) ||
+        getStudentWorld()->isBlockingObjectAt(getX()+4, getY()) ||
+        getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-3))
+        {
+
+        }
+        else {
+            moveTo(getX(), getY()-4);
+        }
     }
-
-
 
     if (getStudentWorld()->getKey(ch)) {
         double x, y;
@@ -306,10 +260,9 @@ void StarGoodie::doSomething() {
 }
 
 void Fireball::helper() {
-    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
-    getStudentWorld()->isBlockingObjectAt(getX()+7, getY()-1))
-    
-     {
+    if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2) || 
+    getStudentWorld()->isBlockingObjectAt(getX()+7, getY()-2))
+    {
     }
     else {
         moveTo(getX(), getY()-2);
@@ -425,7 +378,7 @@ void Piranha::doSomething() {
         return;
     }
     increaseAnimationNumber();
-    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
+    if (getStudentWorld()->isOverlapPeach(getX(), getY()) || getStudentWorld()->isOverlapPeach(getX()+7, getY())) {
         getStudentWorld()->bonkPeach();
         isBonked();
         return;
@@ -433,7 +386,7 @@ void Piranha::doSomething() {
     if (!(abs(getStudentWorld()->getPeachY()-getY()) <= 1.5 * SPRITE_HEIGHT)) {
         return;
     }
-    if (getStudentWorld()->getPeachX()-getX() < getX()) {
+    if (getStudentWorld()->getPeachX() < getX()) {
         setDirection(180);
     }
     else {

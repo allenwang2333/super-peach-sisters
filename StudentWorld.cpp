@@ -225,18 +225,18 @@ string StudentWorld::intToString(int input) {
     return ss.str();
 }
 
-void StudentWorld::bonk(double x, double y) {
+bool StudentWorld::bonk(double x, double y) {
     // traversing through vector bonk target object
     for (vector<Actor*>::iterator p = m_actors.begin(); p != m_actors.end(); p++){
         if((x >= (*p)->getX() && x < (*p)->getX() + SPRITE_WIDTH) && (y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT) ||
             (x + 4 >= (*p)->getX() && x + 4 < (*p)->getX() + SPRITE_WIDTH && y >= (*p)->getY() && y < (*p)->getY() + SPRITE_HEIGHT)) {
             if ((*p)->isAlive()){
                 (*p)->isBonked();
-                return;
+                return true;
             }
         }
     }
-    return;
+    return false;
 }
 
 bool StudentWorld::damage(double x, double y) {

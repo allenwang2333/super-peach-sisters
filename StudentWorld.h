@@ -15,13 +15,12 @@ class StudentWorld : public GameWorld
 public:
   StudentWorld(std::string assetPath);
   virtual ~StudentWorld();
-  virtual int init();
-  virtual int move();
-  virtual void cleanUp();
-  virtual void bonk(double x, double y);
-  virtual bool damage(double x, double y);
-  virtual bool isBlockingObjectAt(double x, double y);
-  virtual Peach* getPeach() { return m_peach; }
+  int init();
+  int move();
+  void cleanUp();
+  bool bonk(double x, double y);
+  bool damage(double x, double y);
+  bool isBlockingObjectAt(double x, double y);
   virtual void newFireball(double x, double y, int dir, int type);
   virtual void newGoodie(double x, double y, int type);
   virtual void newShell(double x, double y, int dir);
