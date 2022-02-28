@@ -406,15 +406,15 @@ void Piranha::doSomething() {
     }
     if (m_firingDelay > 0){
         m_firingDelay--;
+        return;
     }
-    double distance = abs(getStudentWorld()->getPeachX() - this->getX());
+    double distance = abs(getStudentWorld()->getPeachX() - getX());
     // use absolute value from cmath lib
     if (distance < 8 * SPRITE_WIDTH) {
-        if (m_firingDelay <= 0) {
             getStudentWorld()->newFireball(getX(), getY(), getDirection(), 1);
             getStudentWorld()->playSound(SOUND_PIRANHA_FIRE);
             m_firingDelay = 40;
-        }   
+        
     }
 }
 

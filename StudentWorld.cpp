@@ -91,7 +91,7 @@ int StudentWorld::init()
                     m_actors.push_back(new Koopa(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, 180 * randInt(0, 1)));
                     break;
                 case Level::piranha:
-                    m_actors.push_back(new Piranha(this, i * SPRITE_HEIGHT, j * SPRITE_WIDTH, 180 * randInt(0, 1)));
+                    m_actors.push_back(new Piranha(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, 180 * randInt(0, 1)));
                     break;
                 default:
                     break;
@@ -186,7 +186,6 @@ int StudentWorld::move()
     // if die
     if (!m_peach->isAlive()){
         playSound(SOUND_PLAYER_DIE);
-        cerr <<"pach is killed" << endl;
         decLives();
         return GWSTATUS_PLAYER_DIED;
     }
