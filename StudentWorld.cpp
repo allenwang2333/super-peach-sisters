@@ -44,11 +44,11 @@ int StudentWorld::init()
     string level_file = "level" + s + ".txt";
     Level::LoadResult result = lev.loadLevel(level_file);
     if (result == Level::load_fail_file_not_found) {
-        cerr << "Could not find" << s <<" data file" << endl;
+        cerr << "Could not find" << level_file <<" data file" << endl;
         return GWSTATUS_LEVEL_ERROR;
     }
     else if (result == Level::load_fail_bad_format) {
-        cerr << "level01.txt is improperly formatted" << endl; 
+        cerr <<  level_file << "is improperly formatted" << endl; 
         return GWSTATUS_LEVEL_ERROR;
     }
     else if (result == Level::load_success) {
@@ -118,6 +118,11 @@ bool StudentWorld::isBlockingObjectAt(double x, double y) {
 }
 
 bool StudentWorld::isOverlap(double x, double y) {
+    return (isOverlapHelper(x, y) || isOverlapHelper(x, y+SPRITE_HEIGHT-1) ||
+    isOverlapHelper(x+SPRITE_WIDTH-1, y) || isOverlapHelper(x+SPRITE_WIDTH-1, y+SPRITE_HEIGHT-1));
+}
+
+bool StudentWorld::isOverlapHelper(double x, double y) {
     /*
         for given x, y
         if x y is in the range of a blocking oject in vector of actors 
@@ -133,6 +138,11 @@ bool StudentWorld::isOverlap(double x, double y) {
 }
 
 bool StudentWorld::isOverlapPeach(double x, double y) {
+    return (isOverlapPeachHelper(x, y) || isOverlapPeachHelper(x+SPRITE_WIDTH-1, y) ||
+        isOverlapPeachHelper(x, y+SPRITE_HEIGHT-1) || isOverlapPeachHelper(x+SPRITE_WIDTH-1, y+SPRITE_HEIGHT-1));
+}
+
+bool StudentWorld::isOverlapPeachHelper(double x, double y) {
     // return true if overlaps peach
     double peachX = m_peach->getX();
     double peachY = m_peach->getY();
@@ -177,6 +187,7 @@ int StudentWorld::move()
     if (!m_peach->isAlive()){
         playSound(SOUND_PLAYER_DIE);
         cerr <<"pach is killed" << endl;
+        decLives();
         return GWSTATUS_PLAYER_DIED;
     }
     // if reach to next level

@@ -45,7 +45,7 @@ void Block::isBonked() {
 
 void Peach::isBonked() {
     if (m_starPower > 0 || m_temporaryInvincibility > 0) {
-        
+        // has star power does nothing
     }
     else {
         m_hitPoint--;
@@ -62,7 +62,7 @@ void Peach::isBonked() {
 }
 
 void Peach::isDamaged() {
-    isBonked();
+    isBonked(); // does the same lol
 }
 
 void Peach::setHitPoint(int point) {
@@ -70,6 +70,11 @@ void Peach::setHitPoint(int point) {
 }
 
 void Peach::gainPower(int type) {
+/*
+    starGoodie = 1 --> starPower
+    flowerGoodie = 2 --> shootPower
+    mushroomGoodie = 3 --> jumpPower
+*/
     switch (type)
     {
     case 1:
@@ -105,14 +110,10 @@ void Peach::doSomething() {
         m_timeToRecharge--;
     }
     
-    if (getStudentWorld()->isOverlap(getX(), getY()) ||
-    getStudentWorld()->isOverlap(getX()+7, getY()) ||
-    getStudentWorld()->isOverlap(getX(), getY()+7) ||
-    getStudentWorld()->isOverlap(getX()+7, getY()+7)
-    ) {
+    if (getStudentWorld()->isOverlap(getX(), getY())) {
         if (getStudentWorld()->bonk(getX(), getY()) ||
-        getStudentWorld()->bonk(getX()+7, getY())
-        ) {
+        getStudentWorld()->bonk(getX()+7, getY())) {
+            // left or right
             isBonked();
         }
     }
@@ -122,6 +123,7 @@ void Peach::doSomething() {
         double y = getY()+4;
 
         if (getStudentWorld()->isBlockingObjectAt(x, getY()+9) || getStudentWorld()->isBlockingObjectAt(x+4, getY()+9)) {
+            // if something above his head
             getStudentWorld()->bonk(x, getY()+12);
             m_rJumpDistance = 0;
             return;
@@ -137,7 +139,7 @@ void Peach::doSomething() {
         getStudentWorld()->isBlockingObjectAt(getX()+4, getY()) ||
         getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-3))
         {
-
+            // has something under feet, does nothing
         }
         else {
             moveTo(getX(), getY()-4);
@@ -202,12 +204,13 @@ void Peach::doSomething() {
 }
 
 void Goodie::helper() {
+    // Goodies have same free fall and change direcion
+    // so i put them in a helper function in base class of goodies
     if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-1) || 
     getStudentWorld()->isBlockingObjectAt(getX()+4, getY()-1)) {
     }
     else {
         moveTo(getX(), getY()-2);
-        //return;
     }
     double x = getX();
     double y = getY();
@@ -225,6 +228,7 @@ void Goodie::helper() {
 }
 
 void FlowerGoodie::doSomething() {
+    // something that are different in each goodie class
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->increaseScore(50);
         getStudentWorld()->gainPeachPower(2);
@@ -237,6 +241,7 @@ void FlowerGoodie::doSomething() {
 }
 
 void MushroomGoodie::doSomething() {
+    // something that are different in each goodie class
     if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->increaseScore(75);
         getStudentWorld()->gainPeachPower(3);
@@ -249,7 +254,8 @@ void MushroomGoodie::doSomething() {
 }
 
 void StarGoodie::doSomething() {
-    if ((getStudentWorld()->isOverlapPeach(getX(), getY()))) {
+    // something that are different in each goodie class
+    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->increaseScore(150);
         getStudentWorld()->gainPeachPower(1);
         setDead();
@@ -260,6 +266,8 @@ void StarGoodie::doSomething() {
 }
 
 void Fireball::helper() {
+    // fire ball class has same falling and disapper functionality
+    // so i put it in the base class of fireball
     if (getStudentWorld()->isBlockingObjectAt(getX(), getY()-2) || 
     getStudentWorld()->isBlockingObjectAt(getX()+7, getY()-2))
     {
@@ -285,9 +293,8 @@ void Fireball::helper() {
 
 
 void PeachFireball::doSomething() {
-    if (getStudentWorld()->isOverlap(getX(), getY()) || 
-    getStudentWorld()->isOverlap(getX()+7,getY())
-    )
+    // if is overlap kill the enemy
+    if (getStudentWorld()->isOverlap(getX(), getY()))
     {
         if(getStudentWorld()->damage(getX(), getY()) || getStudentWorld()->damage(getX()+7, getY())) {
             setDead();
@@ -298,9 +305,8 @@ void PeachFireball::doSomething() {
 }
 
 void PiranhaFireball::doSomething() {
-    if (getStudentWorld()->isOverlapPeach(getX(), getY()) ||
-        getStudentWorld()->isOverlapPeach(getX()+8, getY())
-       ) {
+    // if is overlap with peach, kill peach
+    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->damagePeach();
         setDead();
     }
@@ -308,8 +314,8 @@ void PiranhaFireball::doSomething() {
 }
 
 void Shell::doSomething() {
-    if (getStudentWorld()->isOverlap(getX(), getY()) ||
-    getStudentWorld()->isOverlap(getX()+7,getY())) {
+    // kill the enemy it touches
+    if (getStudentWorld()->isOverlap(getX(), getY())) {
         if(getStudentWorld()->damage(getX(), getY()) || getStudentWorld()->damage(getX()+7, getY())) {
             setDead();
             return;
@@ -319,12 +325,12 @@ void Shell::doSomething() {
 }
 
 void Enemies::doSomething() {
+    // Koopa and Goomba has same doSomething function
+    // so i put it in the base class
     if (!isAlive()){
         return;
     }
-    if (getStudentWorld()->isOverlapPeach(getX(), getY()) ||
-    getStudentWorld()->isOverlapPeach(getX()+7, getY())
-    ){
+    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->bonkPeach();
         isBonked();
         return;
@@ -346,7 +352,10 @@ void Enemies::doSomething() {
 }
 
 void Enemies::isBonked() {
+    // Goomba and Piranha has same is bonked and is damaged functino
+    // so i put them in the function in base class
     if (getStudentWorld()->getPeachPower(1)){
+        // 1 is star power
         getStudentWorld()->playSound(SOUND_PLAYER_KICK);
         getStudentWorld()->increaseScore(100);
         setDead();
@@ -368,17 +377,20 @@ void Koopa::isBonked() {
 }
 
 void Koopa::isDamaged() {
+    // generate a new shell when killed
     getStudentWorld()->increaseScore(100);
     setDead();
     getStudentWorld()->newShell(getX(), getY(), getDirection());
 }
 
 void Piranha::doSomething() {
+    // Piranha has different implementation of doSomething
+    // so i overwrite it.
     if (!isAlive()) {
         return;
     }
     increaseAnimationNumber();
-    if (getStudentWorld()->isOverlapPeach(getX(), getY()) || getStudentWorld()->isOverlapPeach(getX()+7, getY())) {
+    if (getStudentWorld()->isOverlapPeach(getX(), getY())) {
         getStudentWorld()->bonkPeach();
         isBonked();
         return;
@@ -396,6 +408,7 @@ void Piranha::doSomething() {
         m_firingDelay--;
     }
     double distance = abs(getStudentWorld()->getPeachX() - this->getX());
+    // use absolute value from cmath lib
     if (distance < 8 * SPRITE_WIDTH) {
         if (m_firingDelay <= 0) {
             getStudentWorld()->newFireball(getX(), getY(), getDirection(), 1);
@@ -412,7 +425,7 @@ void Flag::doSomething() {
     if (getStudentWorld()->isOverlapPeach(getX(), getY())){
         getStudentWorld()->increaseScore(1000);
         setDead();
-        getStudentWorld()->moveToNext();
+        getStudentWorld()->moveToNext(); // go to next level
     }
 }
 
@@ -423,6 +436,6 @@ void Mario::doSomething() {
     if (getStudentWorld()->isOverlapPeach(getX(), getY())){
         getStudentWorld()->increaseScore(1000);
         setDead();
-        getStudentWorld()->reachedMario();
+        getStudentWorld()->reachedMario(); // reach mario 
     }
 }

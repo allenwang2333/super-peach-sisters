@@ -43,11 +43,11 @@ class Peach :public Actor {
         virtual ~Peach() {}
         virtual void isBonked();
         virtual void isDamaged();
-        virtual void gainPower(int type);
-        virtual void setHitPoint(int point);
-        virtual bool getStarPower() {return m_starPower>0;}
-        virtual bool getShootPower() {return m_shootPower;}
-        virtual bool getJumpPower() {return m_jumPower;}
+        void gainPower(int type);
+        void setHitPoint(int point);
+        bool getStarPower() {return m_starPower>0;}
+        bool getShootPower() {return m_shootPower;}
+        bool getJumpPower() {return m_jumPower;}
         virtual bool isDamageable() {return true;}
         virtual void doSomething();
     private:
@@ -76,7 +76,7 @@ class Fireball :public Actor {
         virtual ~Fireball() {}
         virtual void isBonked() {}
         virtual void doSomething() {}
-        virtual void helper();
+        void helper();
     private:
     // kind: 0 --> peachFireball
     // kind: 1 --> piranhaFireball
@@ -124,7 +124,6 @@ class BlockingObjects: public Actor {
         virtual void isBonked();
         virtual void doSomething() {}
         virtual bool isBlocking() {return true;}
-        virtual bool isDamageable() {return false;}
 
     private:
 };
@@ -167,7 +166,7 @@ class Goodie :public Actor {
         virtual ~Goodie() {}
         virtual void isBonked() {}
         virtual void doSomething() {}
-        virtual void helper();
+        void helper();
     private:
     /*
             noGoodie = 0

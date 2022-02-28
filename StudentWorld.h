@@ -21,11 +21,13 @@ public:
   bool bonk(double x, double y);
   bool damage(double x, double y);
   bool isBlockingObjectAt(double x, double y);
-  virtual void newFireball(double x, double y, int dir, int type);
-  virtual void newGoodie(double x, double y, int type);
-  virtual void newShell(double x, double y, int dir);
-  virtual void deleteActor();
+  void newFireball(double x, double y, int dir, int type);
+  void newGoodie(double x, double y, int type);
+  void newShell(double x, double y, int dir);
+  void deleteActor();
+  bool isOverlapHelper(double x, double y);
   bool isOverlap(double x, double y);
+  bool isOverlapPeachHelper(double x, double y);
   bool isOverlapPeach(double x, double y);
   void moveToNext();
   void reachedMario();
