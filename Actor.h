@@ -37,7 +37,7 @@ class Peach :public Actor {
         : Actor(studentWorld, IID_PEACH, startX, startY, 0, 0, 1.0),
          m_health(1), m_temporaryInvincibility(0), 
          m_starPower(0), m_shootPower(false), m_jumPower(false), 
-         m_timeToRecharge(0), m_rJumpDistance(0), m_hitPoint(0)
+         m_timeToRecharge(0), m_rJumpDistance(0), m_hitPoint(1)
           {}
 
         virtual ~Peach() {}

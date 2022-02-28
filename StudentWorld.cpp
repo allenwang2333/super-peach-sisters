@@ -93,6 +93,9 @@ int StudentWorld::init()
                 case Level::piranha:
                     m_actors.push_back(new Piranha(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT, 180 * randInt(0, 1)));
                     break;
+                case Level::mario:
+                    m_actors.push_back(new Mario(this, i * SPRITE_WIDTH, j * SPRITE_HEIGHT));
+                    break;
                 default:
                     break;
                 }        

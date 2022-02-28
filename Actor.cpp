@@ -78,7 +78,7 @@ void Peach::gainPower(int type) {
     switch (type)
     {
     case 1:
-        m_starPower = 100;
+        m_starPower += 100;
         break;
     case 2:
         m_shootPower = true;
@@ -154,7 +154,7 @@ void Peach::doSomething() {
             setDirection(180);
             x = (getX()-4);
             y = getY();
-            if (getStudentWorld()->isBlockingObjectAt(x, y)){
+            if (getStudentWorld()->isBlockingObjectAt(x, y) || getStudentWorld()->isBlockingObjectAt(x, y+7)){
                 getStudentWorld()->bonk(x,y);
             }
             else {
@@ -165,7 +165,7 @@ void Peach::doSomething() {
             setDirection(0);
             x = (getX()+8);
             y = getY();
-            if (getStudentWorld()->isBlockingObjectAt(x, y)){
+            if (getStudentWorld()->isBlockingObjectAt(x, y) || getStudentWorld()->isBlockingObjectAt(x, y+7)){
                 getStudentWorld()->bonk(x, y);
             }
             else {
