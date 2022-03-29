@@ -1,4 +1,5 @@
-# Super Peach Sisters 
+# Super Peach Sisters
+
 UCLA CS 32 project with Prof. Smallberg
 
 Final Grade: 100/100 
